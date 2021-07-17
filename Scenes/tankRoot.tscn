@@ -1,6 +1,7 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Scenes/wheelBaseRoot.gd" type="Script" id=1]
+[ext_resource path="res://Scenes/tankRoot.gd" type="Script" id=2]
 
 [sub_resource type="CubeMesh" id=1]
 
@@ -23,6 +24,7 @@ points = PoolVector3Array( 0, 1, 1, 0.0980171, 1, 0.995185, 0.19509, 1, 0.980785
 albedo_color = Color( 0.972549, 0.878431, 0.45098, 1 )
 
 [node name="tankRoot" type="Spatial"]
+script = ExtResource( 2 )
 
 [node name="tankBody" type="RigidBody" parent="."]
 
@@ -41,10 +43,10 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.409718, 0 )
 [node name="cameraHorizontal" type="Spatial" parent="cameraRoot"]
 
 [node name="cameraVertical" type="Spatial" parent="cameraRoot/cameraHorizontal"]
-transform = Transform( 1, 0, 0, 0, 0.945967, 0.324264, 0, -0.324264, 0.945967, 0, 0, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 
-[node name="ClippedCamera" type="ClippedCamera" parent="cameraRoot/cameraHorizontal/cameraVertical"]
-transform = Transform( 1, 0, 0, 0, 1, -2.98023e-08, 0, 2.98023e-08, 1, 0, 5.96046e-08, 2.62536 )
+[node name="ClippedCamera" type="ClippedCamera" parent="cameraRoot"]
+transform = Transform( 1, 0, 0, 0, 1, -2.98023e-08, 0, 2.98023e-08, 1, 0, 5.96046e-08, 4.74125 )
 
 [node name="PinJointBodyWithWheelBase" type="Generic6DOFJoint" parent="."]
 nodes/node_a = NodePath("../tankBody")
