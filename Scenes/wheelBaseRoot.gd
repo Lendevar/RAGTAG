@@ -1,9 +1,7 @@
-
 extends VehicleBody
 
-export(Array) var arrayWheels
+export (Array) var arrayWheels
+
 
 func _ready():
-	pass # Replace with function body.
-
-
+	pass  # Replace with function body.
