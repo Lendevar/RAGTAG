@@ -1,6 +1,7 @@
 extends Spatial
 
 export(float) var mousesense = 0.25
+
 export(int) var maxEngineForce = 100
 export(int) var maxBrakingForce = 100
 export(int) var torqueForce = 2000
@@ -11,12 +12,15 @@ export(float) var barrelTurnSpeed = 0.5
 var turretAimingRotation = Vector3()
 var barrelAimingRotation = Vector3()
 
+
 var mousepos = Vector2()
 var camIncrement = Vector2()
 var screensize = Vector2()
 
+
 var collPoint = Vector3()
 var collObj = Spatial
+
 
 func _ready():
 	
@@ -49,6 +53,7 @@ func rotateCamera():
 		
 	$cameraRoot.rotation.z = 0
 	
+
 	if Input.is_action_pressed("mouse_right"):
 		
 		$cameraRoot/ClippedCamera/RayCast.enabled = false
@@ -208,9 +213,7 @@ func turnBarrel():
 		else:
 			
 			$tankBody/turretBody/barrelBody.rotate_x(deg2rad(-barrelTurnSpeed))
-			
-		
-	
+
 
 func _process(delta):
 	
