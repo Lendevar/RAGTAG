@@ -1,2 +1,2 @@
-# CUMGUN
-CUMGUN super experimental project, currently in development
+# FUNGUN
+FUNGUN super experimental project, currently in development
