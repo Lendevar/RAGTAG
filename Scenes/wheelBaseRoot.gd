@@ -1,4 +1,5 @@
-extends Spatial
+
+extends VehicleBody
 
 export(Array) var arrayWheels
 
