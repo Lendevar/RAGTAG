@@ -19,6 +19,7 @@ var screensize = Vector2()
 var collPoint = Vector3()
 var collObj = Spatial
 
+signal shoot
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
@@ -29,8 +30,8 @@ func rotateCamera():
 
 	get_viewport().warp_mouse(screensize / 2)
 
-	$cameraRoot.global_transform.origin = $tankBody.global_transform.origin
-	$cameraRoot.global_transform.origin.y = $tankBody.global_transform.origin.y + 0.75
+	$cameraRoot.global_transform.origin = $tankBody/turretBody.global_transform.origin
+	$cameraRoot.global_transform.origin.y = $tankBody/turretBody.global_transform.origin.y + 0.75
 
 	mousepos = $cameraRoot/ClippedCamera.get_viewport().get_mouse_position()
 
@@ -65,7 +66,13 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("scroll_down"):
 		if $cameraRoot.scale.x < 1.9:
 			$cameraRoot.scale *= 1.1
-
+	
+	if event.is_action_pressed("mouse_left"):
+		var releasePoint = $tankBody/turretBody/barrelBody/muzzlePoint.global_transform.origin
+		var targetPoint = $tankBody/turretBody/barrelBody/RayCast.get_collision_point()
+		
+		emit_signal("shoot", releasePoint, targetPoint)
+	
 
 func moveForwardBackward():
 	if Input.is_action_pressed("move_backward"):
@@ -84,25 +91,35 @@ func moveForwardBackward():
 	else:
 		$wheelBaseRoot.engine_force = 0.01
 
+var turnPossible = false
 
 func turnLeftRight():
-	if Input.is_action_pressed("turn_left"):
-		var actuallTorque = (
-			torqueForce
-			* (torqueForce - $tankBody.linear_velocity.length() * 100)
-			/ torqueForce
-		)
+	for wheel in $wheelBaseRoot.arrayWheels:
+		wheel = $wheelBaseRoot.get_node(wheel)
+		if wheel.is_in_contact():
+			turnPossible = true
+			break
+		else:
+			turnPossible = false
+	
+	if turnPossible == true:
+		if Input.is_action_pressed("turn_left"):
+			var actuallTorque = (
+				torqueForce
+				* (torqueForce - $tankBody.linear_velocity.length() * 100)
+				/ torqueForce
+			)
 
-		$tankBody.add_torque(Vector3(0, 1, 0) * actuallTorque)
+			$tankBody.add_torque(Vector3(0, 1, 0) * actuallTorque)
 
-	if Input.is_action_pressed("turn_right"):
-		var actuallTorque = (
-			torqueForce
-			* (torqueForce - $tankBody.linear_velocity.length() * 100)
-			/ torqueForce
-		)
+		if Input.is_action_pressed("turn_right"):
+			var actuallTorque = (
+				torqueForce
+				* (torqueForce - $tankBody.linear_velocity.length() * 100)
+				/ torqueForce
+			)
 
-		$tankBody.add_torque(Vector3(0, -1, 0) * actuallTorque)
+			$tankBody.add_torque(Vector3(0, -1, 0) * actuallTorque)
 
 
 func turnTurret():
@@ -161,7 +178,10 @@ func turnBarrel():
 			$tankBody/turretBody/barrelBody.rotate_x(deg2rad(barrelTurnSpeed))
 		else:
 			$tankBody/turretBody/barrelBody.rotate_x(deg2rad(-barrelTurnSpeed))
-
+	
+	var targetPoint = $tankBody/turretBody/barrelBody/RayCast.get_collision_point()
+	$cameraRoot/ClippedCamera/lblCenter.rect_position = $cameraRoot/ClippedCamera.unproject_position(targetPoint)
+	$cameraRoot/ClippedCamera/lblO.rect_position = screensize / 2
 
 func _process(delta):
 	rotateCamera()
@@ -169,3 +189,4 @@ func _process(delta):
 	turnLeftRight()
 	turnTurret()
 	turnBarrel()
+
