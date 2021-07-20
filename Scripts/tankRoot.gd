@@ -24,7 +24,7 @@ signal shoot
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 
-
+#Super useful comment O_O
 func rotateCamera():
 	screensize = get_viewport().size
 
