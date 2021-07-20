@@ -1,9 +1,4 @@
-[gd_scene load_steps=5 format=2]
-
-
-[ext_resource path="res://Scenes/tankScene.tscn" type="PackedScene" id=1]
-
-
+[gd_scene load_steps=4 format=2]
 
 [sub_resource type="BoxShape" id=1]
 extents = Vector3( 1, 4.15135, 1 )
@@ -25,8 +20,3 @@ shape = SubResource( 1 )
 transform = Transform( 0.999999, 1.59256e-06, -0.00065165, -0.415524, 0.999999, 0.28386, 0.000894932, -1.49072e-06, 1, 0, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = SubResource( 3 )
-
-
-[node name="tankScene" parent="." instance=ExtResource( 1 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.64145, 0 )
-
