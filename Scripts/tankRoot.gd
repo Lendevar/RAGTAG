@@ -3,7 +3,7 @@ extends Spatial
 export (float) var mousesense = 0.25
 
 export (int) var maxEngineForce = 100
-export (int) var maxBrakingForce = 100
+export (int) var maxBrakingForce = 1000
 export (int) var torqueForce = 2000
 
 export (float) var turretTurnSpeed = 1
@@ -25,37 +25,36 @@ func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 
 
-func rotateCamera():
+func rotateCamera(cameraRoot, camera, turret, ray):
 	screensize = get_viewport().size
 
 	get_viewport().warp_mouse(screensize / 2)
 
-	$cameraRoot.global_transform.origin = $tankBody/turretBody.global_transform.origin
-	$cameraRoot.global_transform.origin.y = $tankBody/turretBody.global_transform.origin.y + 0.75
+	cameraRoot.global_transform.origin = turret.global_transform.origin
+	cameraRoot.global_transform.origin.y = turret.global_transform.origin.y + 0.75
 
-	mousepos = $cameraRoot/ClippedCamera.get_viewport().get_mouse_position()
+	mousepos = camera.get_viewport().get_mouse_position()
 
 	camIncrement = mousepos - screensize / 2
 
-	$cameraRoot.rotation_degrees.x += -camIncrement.y * mousesense
-	$cameraRoot.rotation_degrees.y += -camIncrement.x * mousesense
+	cameraRoot.rotation_degrees.x += -camIncrement.y * mousesense
+	cameraRoot.rotation_degrees.y += -camIncrement.x * mousesense
 
-	if $cameraRoot.rotation_degrees.x >= 40.1:
-		$cameraRoot.rotation_degrees.x = 40
+	if cameraRoot.rotation_degrees.x >= 40.1:
+		cameraRoot.rotation_degrees.x = 40
 
-	if $cameraRoot.rotation_degrees.x <= -70.1:
-		$cameraRoot.rotation_degrees.x = -70
+	if cameraRoot.rotation_degrees.x <= -70.1:
+		cameraRoot.rotation_degrees.x = -70
 
-	$cameraRoot.rotation.z = 0
+	cameraRoot.rotation.z = 0
 
 	if Input.is_action_pressed("mouse_right"):
-		$cameraRoot/ClippedCamera/RayCast.enabled = false
+		ray.enabled = false
 	else:
-		$cameraRoot/ClippedCamera/RayCast.enabled = true
+		ray.enabled = true
 
-		collPoint = $cameraRoot/ClippedCamera/RayCast.get_collision_point()
-		collObj = $cameraRoot/ClippedCamera/RayCast.get_collider()
-
+		collPoint = ray.get_collision_point()
+		collObj = ray.get_collider()
 
 func _input(event: InputEvent) -> void:
 	# zoom
@@ -74,28 +73,28 @@ func _input(event: InputEvent) -> void:
 		emit_signal("shoot", releasePoint, targetPoint)
 	
 
-func moveForwardBackward():
+func moveForwardBackward(wheelBaseRoot):
 	if Input.is_action_pressed("move_backward"):
-		if $wheelBaseRoot.brake <= maxBrakingForce:
-			$wheelBaseRoot.brake += maxBrakingForce * 0.2
+		if wheelBaseRoot.brake <= maxBrakingForce:
+			wheelBaseRoot.brake += maxBrakingForce * 0.2
 		else:
-			$wheelBaseRoot.brake = maxBrakingForce
+			wheelBaseRoot.brake = maxBrakingForce
 	else:
-		$wheelBaseRoot.brake = 0
+		wheelBaseRoot.brake = 0
 
 	if Input.is_action_pressed("move_forward"):
-		if $wheelBaseRoot.engine_force <= maxEngineForce:
-			$wheelBaseRoot.engine_force += maxEngineForce * 0.08
+		if wheelBaseRoot.engine_force <= maxEngineForce:
+			wheelBaseRoot.engine_force += maxEngineForce * 0.08
 		else:
-			$wheelBaseRoot.engine_force = maxEngineForce
+			wheelBaseRoot.engine_force = maxEngineForce
 	else:
-		$wheelBaseRoot.engine_force = 0.01
+		wheelBaseRoot.engine_force = 0.01
 
 var turnPossible = false
 
-func turnLeftRight():
-	for wheel in $wheelBaseRoot.arrayWheels:
-		wheel = $wheelBaseRoot.get_node(wheel)
+func turnLeftRight(wheelBaseRoot, tankBody):
+	for wheel in wheelBaseRoot.arrayWheels:
+		wheel = wheelBaseRoot.get_node(wheel)
 		if wheel.is_in_contact():
 			turnPossible = true
 			break
@@ -106,87 +105,89 @@ func turnLeftRight():
 		if Input.is_action_pressed("turn_left"):
 			var actuallTorque = (
 				torqueForce
-				* (torqueForce - $tankBody.linear_velocity.length() * 100)
+				* (torqueForce - tankBody.linear_velocity.length() * 100)
 				/ torqueForce
 			)
 
-			$tankBody.add_torque(Vector3(0, 1, 0) * actuallTorque)
+			tankBody.add_torque(Vector3(0, 1, 0) * actuallTorque)
 
 		if Input.is_action_pressed("turn_right"):
 			var actuallTorque = (
 				torqueForce
-				* (torqueForce - $tankBody.linear_velocity.length() * 100)
+				* (torqueForce - tankBody.linear_velocity.length() * 100)
 				/ torqueForce
 			)
 
-			$tankBody.add_torque(Vector3(0, -1, 0) * actuallTorque)
+			tankBody.add_torque(Vector3(0, -1, 0) * actuallTorque)
 
 
-func turnTurret():
+func turnTurret(turretPointer, turretBody):
 	var degreePlus = 0
 	var degreeMinus = 0
 
-	$tankBody/turretPointer.look_at(collPoint, Vector3(0, 1, 0))
+	turretPointer.look_at(collPoint, Vector3(0, 1, 0))
 
-	turretAimingRotation.y = $tankBody/turretPointer.rotation_degrees.y
+	turretAimingRotation.y = turretPointer.rotation_degrees.y
 
-	var floorTurRot = floor($tankBody/turretBody.rotation_degrees.y)
+	var floorTurRot = floor(turretBody.rotation_degrees.y)
 	var floorAimRot = floor(turretAimingRotation.y)
 
 	if floorTurRot != floorAimRot:
 		if floorTurRot >= 0 and floorAimRot >= 0:
 			if floorTurRot >= floorAimRot:
-				$tankBody/turretBody.rotate_y(deg2rad(-turretTurnSpeed))
+				turretBody.rotate_y(deg2rad(-turretTurnSpeed))
 			else:
-				$tankBody/turretBody.rotate_y(deg2rad(turretTurnSpeed))
+				turretBody.rotate_y(deg2rad(turretTurnSpeed))
 
 		if floorTurRot <= 0 and floorAimRot <= 0:
 			if floorTurRot >= floorAimRot:
-				$tankBody/turretBody.rotate_y(deg2rad(-turretTurnSpeed))
+				turretBody.rotate_y(deg2rad(-turretTurnSpeed))
 			else:
-				$tankBody/turretBody.rotate_y(deg2rad(turretTurnSpeed))
+				turretBody.rotate_y(deg2rad(turretTurnSpeed))
 
 		if floorTurRot >= 0 and floorAimRot <= 0:
 			degreePlus = (179 - floorTurRot) + (180 - abs(floorAimRot))
 			degreeMinus = floorTurRot + abs(floorAimRot)
 
 			if degreePlus >= degreeMinus:
-				$tankBody/turretBody.rotate_y(deg2rad(-turretTurnSpeed))
+				turretBody.rotate_y(deg2rad(-turretTurnSpeed))
 			else:
-				$tankBody/turretBody.rotate_y(deg2rad(turretTurnSpeed))
+				turretBody.rotate_y(deg2rad(turretTurnSpeed))
 
 		if floorTurRot < 0 and floorAimRot >= 0:
 			degreePlus = abs(floorTurRot) + floorAimRot
 			degreeMinus = abs(180 + floorTurRot) + (179 - floorAimRot)
 
 			if degreePlus > degreeMinus:
-				$tankBody/turretBody.rotate_y(deg2rad(-turretTurnSpeed))
+				turretBody.rotate_y(deg2rad(-turretTurnSpeed))
 			else:
-				$tankBody/turretBody.rotate_y(deg2rad(turretTurnSpeed))
+				turretBody.rotate_y(deg2rad(turretTurnSpeed))
 
 
-func turnBarrel():
-	$tankBody/turretBody/barrelPointer.look_at(collPoint, Vector3(1, 0, 0))
+func turnBarrel(barrelPointer, barrelBody, ray):
+	barrelPointer.look_at(collPoint, Vector3(1, 0, 0))
 
-	barrelAimingRotation.x = $tankBody/turretBody/barrelPointer.rotation_degrees.x
+	barrelAimingRotation.x = barrelPointer.rotation_degrees.x
 
 	var floorPointerRot = floor(barrelAimingRotation.x)
-	var floorBarrelRot = floor($tankBody/turretBody/barrelBody.rotation_degrees.x)
+	var floorBarrelRot = floor(barrelBody.rotation_degrees.x)
 
 	if floorPointerRot != floorBarrelRot:
 		if floorPointerRot > floorBarrelRot:
-			$tankBody/turretBody/barrelBody.rotate_x(deg2rad(barrelTurnSpeed))
+			barrelBody.rotate_x(deg2rad(barrelTurnSpeed))
 		else:
-			$tankBody/turretBody/barrelBody.rotate_x(deg2rad(-barrelTurnSpeed))
+			barrelBody.rotate_x(deg2rad(-barrelTurnSpeed))
 	
-	var targetPoint = $tankBody/turretBody/barrelBody/RayCast.get_collision_point()
+	var targetPoint = ray.get_collision_point()
+	
+	## Temporary crossfire
 	$cameraRoot/ClippedCamera/lblCenter.rect_position = $cameraRoot/ClippedCamera.unproject_position(targetPoint)
 	$cameraRoot/ClippedCamera/lblO.rect_position = screensize / 2
 
 func _process(delta):
-	rotateCamera()
-	moveForwardBackward()
-	turnLeftRight()
-	turnTurret()
-	turnBarrel()
+	rotateCamera($cameraRoot, $cameraRoot/ClippedCamera, $tankBody/turretBody, $cameraRoot/ClippedCamera/RayCast)
+	moveForwardBackward($wheelBaseRoot)
+	turnLeftRight($wheelBaseRoot, $tankBody)
+	turnTurret($tankBody/turretPointer, $tankBody/turretBody)
+	turnBarrel($tankBody/turretBody/barrelPointer, $tankBody/turretBody/barrelBody, $tankBody/turretBody/barrelBody/RayCast)
 

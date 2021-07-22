@@ -2,56 +2,86 @@ extends Spatial
 
 export (PackedScene) var bulletScene
 var arrayBullets = []
+var arrayFlyingBullets = []
+
+export (Array) var arrayTestEnemiesScene
+var arrayEnemies = []
+var arrayEnemiesModels = []
 
 class bullet:
 	var damage = 10
-	var speed = 0.2
+	var speed = 1
 	var model
 	var trajectory
-	var follow
+
+class enemy:
+	var maxhp = 50
+	var currenthp
+	var model
 
 func _ready():
-	$tankScene.connect("shoot", self, "shootRequested")
+	$tankScene.connect("shoot", self, "testShooting")
+	
+	############ Test code section
+	
+	for enemyFromScene in arrayTestEnemiesScene:
+		var newEnemy = enemy.new()
+		newEnemy.currenthp = newEnemy.maxhp
+		newEnemy.model = get_node(enemyFromScene)
+		
+		arrayEnemiesModels += [newEnemy.model]
+		arrayEnemies += [newEnemy]
 
 
-func shootRequested(muzzle, target):
+func testShooting(muzzle, target):
 	var newBullet = bullet.new()
 	newBullet.model = bulletScene.instance()
-	newBullet.trajectory = Path.new()
-	newBullet.follow = PathFollow.new()
-	newBullet.follow.loop = false
+	newBullet.trajectory = target - muzzle
+	newBullet.trajectory = newBullet.trajectory.normalized()
 	
-	newBullet.trajectory.add_child(newBullet.follow)
-	newBullet.follow.add_child(newBullet.model)
+	add_child(newBullet.model)
+	newBullet.model.global_transform.origin = muzzle
 	
-	newBullet.trajectory.curve.add_point(muzzle)
-	newBullet.trajectory.curve.add_point(target)
-	
-	add_child(newBullet.trajectory)
-	newBullet.model.connect("body_entered", self, "bulletHitSomething")
-	
-	arrayBullets += [newBullet]
+	arrayFlyingBullets += [newBullet]
 
-func moveBullets():
+func bulletHitEnemyNoArmor(bullet, enemy):
+	enemy.currenthp -= bullet.damage
+	print("Hit! HP = ", enemy.currenthp, "/", enemy.maxhp)
+	
+	if enemy.currenthp <= 0:
+		print("Enemy dead!")
+		arrayEnemiesModels.erase(enemy.model)
+		arrayEnemies.erase(enemy)
+		remove_child(enemy.model)
+
+func moveFlyingBullets():
 	var arrayToErase = []
 	
-	for bullet in arrayBullets:
-		bullet.follow.offset += bullet.speed
+	for bullet in arrayFlyingBullets:
 		
-		if bullet.follow.unit_offset == 1:
-			remove_child(bullet.trajectory)
+		var bulletCollision = bullet.model.move_and_collide(bullet.trajectory * bullet.speed)
+		
+		if bulletCollision != null:
+			var collider = bulletCollision.get_collider()
+			
 			arrayToErase += [bullet]
+			remove_child(bullet.model)
+			
+			if collider.get_class() == "KinematicBody":
+				if arrayEnemiesModels.has(collider):
+					for enemy in arrayEnemies:
+						if enemy.model == collider:
+							bulletHitEnemyNoArmor(bullet, enemy)
+						
 	
 	for bullet in arrayToErase:
-		arrayBullets.erase(bullet)
+		arrayFlyingBullets.erase(bullet)
 	
 	arrayToErase.clear()
 
-func bulletHitSomething(whatIsHit):
-	print("Hit detected! ", whatIsHit)
 
 func _process(delta):
-	moveBullets()
+	moveFlyingBullets()
 
 
 

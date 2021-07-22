@@ -1,18 +1,16 @@
 [gd_scene load_steps=3 format=2]
 
-[sub_resource type="SphereMesh" id=2]
+[sub_resource type="SphereMesh" id=1]
 
-[sub_resource type="SphereShape" id=3]
+[sub_resource type="SphereShape" id=2]
 radius = 0.120879
 
-[node name="bulletBody" type="RigidBody"]
-contacts_reported = 2
-contact_monitor = true
+[node name="bulletBody" type="KinematicBody"]
 
 [node name="MeshInstance" type="MeshInstance" parent="."]
 transform = Transform( 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0 )
-mesh = SubResource( 2 )
+mesh = SubResource( 1 )
 material/0 = null
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
-shape = SubResource( 3 )
+shape = SubResource( 2 )
