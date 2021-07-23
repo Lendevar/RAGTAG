@@ -13,12 +13,14 @@ class bullet:
 	var speed = 1
 	var model
 	var trajectory
+
 	var penetration = 35
 
 class enemy:
 	var maxhp = 50
 	var currenthp
 	var model
+
 
 func _ready():
 	$tankScene.connect("shoot", self, "testShooting")
@@ -38,7 +40,7 @@ func testShooting(muzzle, target):
 	newBullet.model = bulletScene.instance()
 	newBullet.trajectory = target - muzzle
 	newBullet.trajectory = newBullet.trajectory.normalized()
-	
+
 	add_child(newBullet.model)
 	newBullet.model.global_transform.origin = muzzle
 	
@@ -71,13 +73,15 @@ func bulletHitArmoredEnemy(bullet, enemy, armor, center, normal):
 		bulletHitEnemyNoArmor(bullet, currentEnemy)
 	else:
 		print("Didn't go through!")
-	
+
 
 func moveFlyingBullets():
 	var arrayToErase = []
 	
 	for bullet in arrayFlyingBullets:
+
 		var bulletCollision = bullet.model.move_and_collide(bullet.trajectory * bullet.speed)
+
 		if bulletCollision != null:
 			var collider = bulletCollision.get_collider()
 			
@@ -89,7 +93,7 @@ func moveFlyingBullets():
 					for enemy in arrayEnemies:
 						if enemy.model == collider:
 							bulletHitEnemyNoArmor(bullet, enemy)
-			
+
 			if collider.get_class() == "StaticBody":
 				if str(collider.get_path()).find("armor") != -1:
 					var armoredEnemyModel = collider.get_parent()
@@ -103,12 +107,13 @@ func moveFlyingBullets():
 							currentEnemy = enemy
 					
 					bulletHitArmoredEnemy(bullet, currentEnemy, collider, armorCenter, armorNormal)
-				
+
 	
 	for bullet in arrayToErase:
 		arrayFlyingBullets.erase(bullet)
 	
 	arrayToErase.clear()
+
 
 func _process(delta):
 	moveFlyingBullets()
