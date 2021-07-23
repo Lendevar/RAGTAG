@@ -3,7 +3,9 @@ extends Spatial
 export (float) var mousesense = 0.25
 
 export (int) var maxEngineForce = 100
+
 export (int) var maxBrakingForce = 1000
+
 export (int) var torqueForce = 2000
 
 export (float) var turretTurnSpeed = 1
@@ -25,10 +27,13 @@ func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 
 
+
 func rotateCamera(cameraRoot, camera, turret, ray):
+
 	screensize = get_viewport().size
 
 	get_viewport().warp_mouse(screensize / 2)
+
 
 	cameraRoot.global_transform.origin = turret.global_transform.origin
 	cameraRoot.global_transform.origin.y = turret.global_transform.origin.y + 0.75
@@ -56,6 +61,7 @@ func rotateCamera(cameraRoot, camera, turret, ray):
 		collPoint = ray.get_collision_point()
 		collObj = ray.get_collider()
 
+
 func _input(event: InputEvent) -> void:
 	# zoom
 	if event.is_action_pressed("scroll_up"):
@@ -72,6 +78,7 @@ func _input(event: InputEvent) -> void:
 		
 		emit_signal("shoot", releasePoint, targetPoint)
 	
+
 
 func moveForwardBackward(wheelBaseRoot):
 	if Input.is_action_pressed("move_backward"):
@@ -95,6 +102,7 @@ var turnPossible = false
 func turnLeftRight(wheelBaseRoot, tankBody):
 	for wheel in wheelBaseRoot.arrayWheels:
 		wheel = wheelBaseRoot.get_node(wheel)
+
 		if wheel.is_in_contact():
 			turnPossible = true
 			break
@@ -105,15 +113,18 @@ func turnLeftRight(wheelBaseRoot, tankBody):
 		if Input.is_action_pressed("turn_left"):
 			var actuallTorque = (
 				torqueForce
+
 				* (torqueForce - tankBody.linear_velocity.length() * 100)
 				/ torqueForce
 			)
 
 			tankBody.add_torque(Vector3(0, 1, 0) * actuallTorque)
 
+
 		if Input.is_action_pressed("turn_right"):
 			var actuallTorque = (
 				torqueForce
+
 				* (torqueForce - tankBody.linear_velocity.length() * 100)
 				/ torqueForce
 			)
@@ -130,11 +141,13 @@ func turnTurret(turretPointer, turretBody):
 	turretAimingRotation.y = turretPointer.rotation_degrees.y
 
 	var floorTurRot = floor(turretBody.rotation_degrees.y)
+
 	var floorAimRot = floor(turretAimingRotation.y)
 
 	if floorTurRot != floorAimRot:
 		if floorTurRot >= 0 and floorAimRot >= 0:
 			if floorTurRot >= floorAimRot:
+
 				turretBody.rotate_y(deg2rad(-turretTurnSpeed))
 			else:
 				turretBody.rotate_y(deg2rad(turretTurnSpeed))
@@ -145,20 +158,24 @@ func turnTurret(turretPointer, turretBody):
 			else:
 				turretBody.rotate_y(deg2rad(turretTurnSpeed))
 
+
 		if floorTurRot >= 0 and floorAimRot <= 0:
 			degreePlus = (179 - floorTurRot) + (180 - abs(floorAimRot))
 			degreeMinus = floorTurRot + abs(floorAimRot)
 
 			if degreePlus >= degreeMinus:
+
 				turretBody.rotate_y(deg2rad(-turretTurnSpeed))
 			else:
 				turretBody.rotate_y(deg2rad(turretTurnSpeed))
+
 
 		if floorTurRot < 0 and floorAimRot >= 0:
 			degreePlus = abs(floorTurRot) + floorAimRot
 			degreeMinus = abs(180 + floorTurRot) + (179 - floorAimRot)
 
 			if degreePlus > degreeMinus:
+
 				turretBody.rotate_y(deg2rad(-turretTurnSpeed))
 			else:
 				turretBody.rotate_y(deg2rad(turretTurnSpeed))
@@ -181,6 +198,7 @@ func turnBarrel(barrelPointer, barrelBody, ray):
 	var targetPoint = ray.get_collision_point()
 	
 	## Temporary crossfire
+
 	$cameraRoot/ClippedCamera/lblCenter.rect_position = $cameraRoot/ClippedCamera.unproject_position(targetPoint)
 	$cameraRoot/ClippedCamera/lblO.rect_position = screensize / 2
 
@@ -190,4 +208,5 @@ func _process(delta):
 	turnLeftRight($wheelBaseRoot, $tankBody)
 	turnTurret($tankBody/turretPointer, $tankBody/turretBody)
 	turnBarrel($tankBody/turretBody/barrelPointer, $tankBody/turretBody/barrelBody, $tankBody/turretBody/barrelBody/RayCast)
+
 
