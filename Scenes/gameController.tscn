@@ -1,5 +1,6 @@
 
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
+
 
 
 [ext_resource path="res://Scenes/testPlane.tscn" type="PackedScene" id=1]
@@ -9,12 +10,17 @@
 
 [ext_resource path="res://Scenes/dummie.tscn" type="PackedScene" id=5]
 
+[ext_resource path="res://Scenes/armoredEnemy.tscn" type="PackedScene" id=6]
+
+
 
 [node name="gameController" type="Spatial"]
 script = ExtResource( 3 )
 bulletScene = ExtResource( 4 )
 
-arrayTestEnemiesScene = [ NodePath("dummie"), NodePath("dummie2") ]
+
+arrayTestEnemiesScene = [ NodePath("dummie"), NodePath("dummie2"), NodePath("armoredEnemy"), NodePath("armoredEnemy2") ]
+=======
 
 
 [node name="testPlane" parent="." instance=ExtResource( 1 )]
@@ -28,4 +34,11 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.14319, 37.3308 )
 
 [node name="dummie2" parent="." instance=ExtResource( 5 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.0594, 46.4862 )
+
+
+[node name="armoredEnemy" parent="." instance=ExtResource( 6 )]
+transform = Transform( -0.25087, 0, 0.968021, 0, 1, 0, -0.968021, 0, -0.25087, -13.4912, 1.48139, 20.1297 )
+
+[node name="armoredEnemy2" parent="." instance=ExtResource( 6 )]
+transform = Transform( -0.899046, -0.221905, -0.377457, 0, 0.862063, -0.506801, 0.437853, -0.455638, -0.775034, 11.9535, 2.46724, 18.5057 )
 
