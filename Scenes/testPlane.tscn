@@ -17,17 +17,18 @@ points = PoolVector3Array( -1, 1, 1, 1, 1, -1, 1, 1, 1, -1, 1, -1, -1, -1, 1, 1,
 
 [node name="Spatial" type="Spatial"]
 
-[node name="StaticBody" type="StaticBody" parent="."]
+[node name="floor" type="StaticBody" parent="."]
 transform = Transform( 55.2324, 0, 0, 0, 0.108096, 0, 0, 0, 47.1473, 0, 0, 0 )
+collision_layer = 5
+collision_mask = 5
 
-[node name="CollisionShape" type="CollisionShape" parent="StaticBody"]
+[node name="CollisionShape" type="CollisionShape" parent="floor"]
 shape = SubResource( 1 )
 
-[node name="MeshInstance" type="MeshInstance" parent="StaticBody"]
+[node name="MeshInstance" type="MeshInstance" parent="floor"]
 transform = Transform( 0.999999, 1.59256e-06, -0.00065165, -0.415524, 0.999999, 0.28386, 0.000894932, -1.49072e-06, 1, 0, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = SubResource( 3 )
-
 
 [node name="StaticBody2" type="StaticBody" parent="."]
 

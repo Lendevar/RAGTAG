@@ -1,6 +1,7 @@
 extends Node
 
-var hp = 100
+var maxhp = 100
+var currenthp = 100
 var inventory = []
 
 func _ready():

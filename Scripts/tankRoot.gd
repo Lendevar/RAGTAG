@@ -21,6 +21,8 @@ var screensize = Vector2()
 var collPoint = Vector3()
 var collObj = Spatial
 
+export (NodePath) var noiseSignature
+
 signal shoot
 
 func _ready():
@@ -77,6 +79,15 @@ func _input(event: InputEvent) -> void:
 		var targetPoint = $tankBody/turretBody/barrelBody/RayCast.get_collision_point()
 		
 		emit_signal("shoot", releasePoint, targetPoint)
+		$noiseSignature.scale = Vector3(30,30,30)
+		$tankBody/testSignature.scale.x = $noiseSignature.scale.x
+		$tankBody/testSignature.scale.z = $noiseSignature.scale.z
+	
+	if event.is_action_pressed("ui_up"):
+		$tankBody.global_transform.origin = Vector3(0,2,0)
+		$wheelBaseRoot.global_transform.origin = Vector3(0,2,0)
+		$tankBody.rotation_degrees = Vector3(0,0,0)
+		$wheelBaseRoot.rotation_degrees = Vector3(0,0,0)
 	
 
 
@@ -96,6 +107,9 @@ func moveForwardBackward(wheelBaseRoot):
 			wheelBaseRoot.engine_force = maxEngineForce
 	else:
 		wheelBaseRoot.engine_force = 0.01
+
+	$noiseSignature.global_transform.origin = $tankBody.global_transform.origin
+
 
 var turnPossible = false
 
@@ -175,11 +189,9 @@ func turnTurret(turretPointer, turretBody):
 			degreeMinus = abs(180 + floorTurRot) + (179 - floorAimRot)
 
 			if degreePlus > degreeMinus:
-
 				turretBody.rotate_y(deg2rad(-turretTurnSpeed))
 			else:
 				turretBody.rotate_y(deg2rad(turretTurnSpeed))
-
 
 func turnBarrel(barrelPointer, barrelBody, ray):
 	barrelPointer.look_at(collPoint, Vector3(1, 0, 0))
@@ -202,11 +214,21 @@ func turnBarrel(barrelPointer, barrelBody, ray):
 	$cameraRoot/ClippedCamera/lblCenter.rect_position = $cameraRoot/ClippedCamera.unproject_position(targetPoint)
 	$cameraRoot/ClippedCamera/lblO.rect_position = screensize / 2
 
+func changeNoiseSignatureSpeed(signature, tankbody):
+	if tankbody.get_linear_velocity().length() > 1:
+		signature.scale = Vector3(1,1,1) * tankbody.get_linear_velocity().length()
+	else:
+		signature.scale = Vector3(1,1,1)
+
 func _process(delta):
 	rotateCamera($cameraRoot, $cameraRoot/ClippedCamera, $tankBody/turretBody, $cameraRoot/ClippedCamera/RayCast)
 	moveForwardBackward($wheelBaseRoot)
 	turnLeftRight($wheelBaseRoot, $tankBody)
 	turnTurret($tankBody/turretPointer, $tankBody/turretBody)
 	turnBarrel($tankBody/turretBody/barrelPointer, $tankBody/turretBody/barrelBody, $tankBody/turretBody/barrelBody/RayCast)
+
+	$tankBody/testSignature.scale.x = $noiseSignature.scale.x
+	$tankBody/testSignature.scale.z = $noiseSignature.scale.z
+	changeNoiseSignatureSpeed($noiseSignature, $tankBody)
 
 

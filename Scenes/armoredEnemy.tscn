@@ -20,6 +20,9 @@ albedo_color = Color( 0.988235, 0.737255, 0.0666667, 1 )
 points = PoolVector3Array( -1, 1, 1, 1, 1, -1, 1, 1, 1, -1, 1, -1, -1, -1, 1, 1, -1, -1, 1, -1, 1, -1, -1, -1, 1, 1, 1, -1, 1, -1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, -1, -1, 1, -1, -1, -1, -1, 1, 1, 1, 1, -1, -1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1, -1, -1, 1, -1, 1, -1, -1 )
 
 [node name="armoredEnemy" type="KinematicBody"]
+
+transform = Transform( -1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0 )
+
 script = ExtResource( 1 )
 armorPlates = [ NodePath("armor") ]
 
@@ -33,12 +36,16 @@ transform = Transform( 1, 0, 0, 0, 0.37725, 0, 0, 0, 1, 0, 0, 0 )
 shape = SubResource( 3 )
 
 [node name="armor" type="StaticBody" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.866165, 0.499758, 0, -0.499758, 0.866165, 0, -0.647658, 0.308203 )
+
+transform = Transform( -1, -1.10251e-07, -6.94556e-08, -1.25784e-07, 0.955927, 0.293607, 3.40242e-08, 0.293607, -0.955927, 2.18912e-08, -0.474379, -0.250406 )
+
 script = ExtResource( 2 )
 armorThickness = 25
 
 [node name="MeshInstance" type="MeshInstance" parent="armor"]
-transform = Transform( 0.603232, 0, 0, 0, 0.530406, 0, 0, 0, 0.0513549, 0, 0.193402, 1.36246 )
+
+transform = Transform( 0.603232, 0, 0, 1.77636e-15, 0.530406, -1.86265e-09, 3.55271e-15, 0, 0.0513549, -5.32907e-15, 0.193402, 1.36246 )
+
 mesh = SubResource( 4 )
 material/0 = SubResource( 5 )
 
@@ -51,3 +58,35 @@ transform = Transform( 0.603232, 0, 0, 0, 0.530406, 0, 0, 0, 0.0513549, 0, 0.193
 
 [node name="normal" type="Spatial" parent="armor"]
 transform = Transform( 0.603232, 0, 0, 0, 0.530406, 0, 0, 0, 0.0513549, 0, 0.193402, 2.02733 )
+
+[node name="rayForwardRoot" type="Spatial" parent="."]
+
+[node name="rayForward" type="RayCast" parent="rayForwardRoot"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.75368, 0 )
+enabled = true
+exclude_parent = false
+cast_to = Vector3( 0, -100, 0 )
+collision_mask = 5
+
+[node name="timerStart" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+autostart = true
+
+[node name="forward" type="Spatial" parent="."]
+
+[node name="timerIdle" type="Timer" parent="."]
+one_shot = true
+
+[node name="rayShoot" type="RayCast" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.66686e-07, 1.85633, -1.90666 )
+enabled = true
+cast_to = Vector3( 0, 0, -10 )
+
+[node name="timerShoot" type="Timer" parent="."]
+wait_time = 2.0
+
+[connection signal="timeout" from="timerStart" to="." method="_on_timerStart_timeout"]
+[connection signal="timeout" from="timerIdle" to="." method="_on_timerIdle_timeout"]
+[connection signal="timeout" from="timerShoot" to="." method="_on_timerShoot_timeout"]
+
