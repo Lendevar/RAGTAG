@@ -1,6 +1,5 @@
 [gd_scene load_steps=3 format=2]
 
-
 [sub_resource type="SphereMesh" id=1]
 
 [sub_resource type="SphereShape" id=2]
@@ -15,4 +14,3 @@ material/0 = null
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
 shape = SubResource( 2 )
-
