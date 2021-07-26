@@ -7,6 +7,7 @@ var arrayFlyingBullets = []
 export (Array) var arrayTestEnemiesScene
 var arrayEnemies = []
 var arrayEnemiesModels = []
+
 var arrayMovingEnemies = []
 var arrayChasingEnemies = []
 export (PackedScene) var armoredEnemyScene
@@ -87,12 +88,13 @@ func giveRoamingPath(coords, whoAsked):
 				enemy.path.curve.add_point(point)
 			arrayMovingEnemies += [enemy]
 
+
 func testShooting(muzzle, target):
 	var newBullet = bullet.new()
 	newBullet.model = bulletScene.instance()
 	newBullet.trajectory = target - muzzle
 	newBullet.trajectory = newBullet.trajectory.normalized()
-	
+
 	add_child(newBullet.model)
 	newBullet.model.global_transform.origin = muzzle
 	
@@ -130,17 +132,21 @@ func bulletHitArmoredEnemy(bullet, enemy, armor, center, normal):
 		print("Didn't go through!")
 	
 
+
 func moveFlyingBullets():
 	var arrayToErase = []
 	
 	for bullet in arrayFlyingBullets:
+
 		var bulletCollision = bullet.model.move_and_collide(bullet.trajectory * bullet.speed, false)
+
 		if bulletCollision != null:
 			var collider = bulletCollision.get_collider()
 			
 			arrayToErase += [bullet]
 			remove_child(bullet.model)
 			
+
 			if arrayPlayerObjects.has(collider):
 				PlayerInfo.currenthp -= bullet.damage
 				print("Player hit! HP=", PlayerInfo.currenthp, "/", PlayerInfo.maxhp)
@@ -174,11 +180,13 @@ func moveFlyingBullets():
 						
 						bulletHitArmoredEnemy(bullet, currentEnemy, collider, armorCenter, armorNormal)
 					
+
 	
 	for bullet in arrayToErase:
 		arrayFlyingBullets.erase(bullet)
 	
 	arrayToErase.clear()
+
 
 func movingEnemies():
 	var arrayToStop = []
@@ -214,6 +222,7 @@ func _process(delta):
 	moveFlyingBullets()
 	movingEnemies()
 	chasingPlayer()
+
 
 
 

@@ -65,6 +65,7 @@ mesh = SubResource( 4 )
 material/0 = null
 
 [node name="muzzlePoint" type="Spatial" parent="tankBody/turretBody/barrelBody"]
+
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.09041e-08, 0, -1.03982 )
 
 [node name="RayCast" type="RayCast" parent="tankBody/turretBody/barrelBody"]

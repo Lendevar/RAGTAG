@@ -107,8 +107,9 @@ func moveForwardBackward(wheelBaseRoot):
 			wheelBaseRoot.engine_force = maxEngineForce
 	else:
 		wheelBaseRoot.engine_force = 0.01
-	
+
 	$noiseSignature.global_transform.origin = $tankBody.global_transform.origin
+
 
 var turnPossible = false
 
@@ -188,7 +189,6 @@ func turnTurret(turretPointer, turretBody):
 			degreeMinus = abs(180 + floorTurRot) + (179 - floorAimRot)
 
 			if degreePlus > degreeMinus:
-
 				turretBody.rotate_y(deg2rad(-turretTurnSpeed))
 			else:
 				turretBody.rotate_y(deg2rad(turretTurnSpeed))
@@ -226,8 +226,9 @@ func _process(delta):
 	turnLeftRight($wheelBaseRoot, $tankBody)
 	turnTurret($tankBody/turretPointer, $tankBody/turretBody)
 	turnBarrel($tankBody/turretBody/barrelPointer, $tankBody/turretBody/barrelBody, $tankBody/turretBody/barrelBody/RayCast)
+
 	$tankBody/testSignature.scale.x = $noiseSignature.scale.x
 	$tankBody/testSignature.scale.z = $noiseSignature.scale.z
 	changeNoiseSignatureSpeed($noiseSignature, $tankBody)
-	
+
 

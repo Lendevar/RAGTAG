@@ -1,6 +1,7 @@
 extends KinematicBody
 
 export(Array) var armorPlates
+
 export(String) var behaviour
 
 export(float) var unitSpeed = 1
@@ -68,3 +69,4 @@ func _process(delta):
 
 func _on_timerShoot_timeout():
 	shootingPlayer()
+
